@@ -1,0 +1,61 @@
+{
+  "name": "ZeeraApp",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "android": "react-native run-android",
+    "ios": "react-native run-ios",
+    "start": "react-native start",
+    "test": "jest",
+    "lint": "eslint .",
+    "android-bundle": "react-native bundle --platform android --dev false --entry-file index.js --bundle-output android/app/src/main/assets/index.android.bundle --assets-dest android/app/src/main/res",
+    "android-release": "cd android && gradlew clean && cd .. && npm run android-bundle && cd android && gradlew assembleRelease && cd ..",
+    "android-release2": "cd android && gradlew clean && cd .. && npm run android-bundle && rm -rf android/app/src/main/res/drawable-* android/app/src/main/res/raw && cd android && gradlew assembleRelease && cd ..",
+    "android-debug": "cd android && gradlew clean && cd .. && npx react-native run-android"
+  },
+  "dependencies": {
+    "@react-native-async-storage/async-storage": "^1.15.5",
+    "@react-native-community/checkbox": "^0.5.8",
+    "@react-native-community/netinfo": "^6.0.1",
+    "@react-native-picker/picker": "^1.16.7",
+    "@react-navigation/bottom-tabs": "^5.11.11",
+    "@react-navigation/native": "^5.9.4",
+    "@react-navigation/stack": "^5.14.5",
+    "axios": "^0.21.1",
+    "buffer": "^6.0.3",
+    "moment": "^2.29.1",
+    "native-base": "^2.13.14",
+    "react": "17.0.2",
+    "react-native": "0.65.1",
+    "react-native-background-timer": "^2.4.1",
+    "react-native-ble-manager": "^7.5.0",
+    "react-native-ble-plx": "^2.0.2",
+    "react-native-bluetooth-classic": "^1.60.0-rc.16",
+    "react-native-geolocation-service": "^4.0.0",
+    "react-native-gesture-handler": "^1.10.3",
+    "react-native-modal-selector-searchable": "^2.1.4",
+    "react-native-safe-area-context": "^3.2.0",
+    "react-native-screens": "^3.6.0",
+    "react-native-sqlite-storage": "^5.0.0",
+    "react-native-vector-icons": "^8.1.0",
+    "react-redux": "^7.2.5",
+    "redux": "^4.1.1",
+    "redux-actions": "^2.6.5",
+    "redux-persist": "^6.0.0",
+    "redux-thunk": "^2.3.0"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.15.0",
+    "@babel/runtime": "^7.15.3",
+    "@react-native-community/eslint-config": "^3.0.0",
+    "babel-jest": "^27.0.6",
+    "eslint": "^7.32.0",
+    "jest": "^27.0.6",
+    "metro-react-native-babel-preset": "^0.66.2",
+    "react-native-codegen": "^0.0.7",
+    "react-test-renderer": "17.0.2"
+  },
+  "jest": {
+    "preset": "react-native"
+  }
+}

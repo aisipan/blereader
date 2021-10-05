@@ -1,0 +1,84 @@
+# OSX
+#
+.DS_Store
+
+# Xcode
+#
+build/
+*.pbxuser
+!default.pbxuser
+*.mode1v3
+!default.mode1v3
+*.mode2v3
+!default.mode2v3
+*.perspectivev3
+!default.perspectivev3
+xcuserdata
+*.xccheckout
+*.moved-aside
+DerivedData
+*.hmap
+*.ipa
+*.xcuserstate
+
+# Android/IntelliJ
+#
+build/
+.idea
+.gradle
+local.properties
+*.iml
+
+# node.js
+#
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# BUCK
+buck-out/
+\.buckd/
+*.keystore
+!debug.keystore
+
+# fastlane
+#
+# It is recommended to not store the screenshots in the git repo. Instead, use fastlane to re-generate the
+# screenshots whenever they are needed.
+# For more information about the recommended setup visit:
+# https://docs.fastlane.tools/best-practices/source-control/
+
+*/fastlane/report.xml
+*/fastlane/Preview.html
+*/fastlane/screenshots
+
+# Bundle artifact
+*.jsbundle
+
+# CocoaPods
+/ios/Pods/
+
+package-lock.json
+yarn.lock
+
+android/app/src/main/res/drawable-*
+android/app/src/main/assets/index.android.bundle
+android/app/src/main/res/raw/
+
+src/pages/BluetoothScreen_backup/*
+src/pages/BluetoothScreen/Connection.js
+src/pages/BluetoothScreen/Connection_*.js
+src/pages/BluetoothScreen/DeviceList.js
+src/pages/DownloadData/index_*
+src/pages/LoginScreen/
+src/pages/Record/
+src/pages/Profile
+scr/routes/index_backup.js
+
+src/functions/ble.js
+src/functions/BluetoothConnection_classic.js
+src/functions/OsbleHeadlessTask.js
+src/functions/OsbleService.js
+src/functions/UploadHeadlessTask.js
+src/functions/UploadService.js
+src/functions/sqlLite.js
