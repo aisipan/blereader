@@ -17,6 +17,7 @@ import {
 } from '../redux/actions'
 import { store } from '../redux/store';
 import * as RootNavigation from '../routes/RootNavigation';
+import { ZeeraAppStartService, ZeeraAppStopService } from './ZeeraAppHeadlessTask';
 
 const COMMAND_GET_FCM_DATA = '.log:1';
 const MAX_LENGTH_LOG_DATA = 20
