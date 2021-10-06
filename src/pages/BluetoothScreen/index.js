@@ -23,12 +23,13 @@ import {
   Right,
 } from 'native-base';
 import { windowHeight } from '../../constants/styles';
-// import ConnectionScreen from './Connection';
 import * as RootNavigation from '../../routes/RootNavigation';
 import { store } from '../../redux/store';
 import {
   connect,
   disconnect,
+  connectBle,
+  disconnectBle,
   toggleConnection
 } from '../../functions/BluetoothConnection';
 import moment from 'moment';
@@ -59,7 +60,7 @@ const BluetoothScreen = () => {
     }
     else {
       console.log('a device found! try to connect....')
-      setTimeout(() => connect(), 0);
+      setTimeout(() => connectBle(), 0);
     }
   }, [device, bluetoothToggleConnection])
 

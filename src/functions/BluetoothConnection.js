@@ -247,7 +247,7 @@ export const connect = async () => {
       console.log('error connect to device', e);
       ToastAndroid.show(e.toString(), ToastAndroid.SHORT);
       //  error connect to device [Error: java.io.IOException: read failed, socket might closed or timeout, read ret: -1]
-      // OsbleStopService(); // sementara ini dulu nantinya jangan diterminate harus re-check sampe bisa connect
+      // ZeeraAppStopService(); // sementara ini dulu nantinya jangan diterminate harus re-check sampe bisa connect
       if (e.toString().includes('read failed')) {
         // let clear = await RNBluetoothClassic.clearFromDevice(store.getState().appReducer.bleAddress);
         let unpair = await RNBluetoothClassic.unpairDevice(store.getState().appReducer.bleAddress);
@@ -405,14 +405,16 @@ export const onReceivedData = async (event) => {
 export const toggleConnection = () => {
   console.log('toggleConnection, state before:', store.getState().appReducer.bluetoothToggleConnection);
   if (store.getState().appReducer.bluetoothToggleConnection) {
-    disconnect();
-    OsbleStopService();
+    // disconnect();
+    disconnectBle();
+    ZeeraAppStopService();
     ToastAndroid.show(`Disconnected Successfully`, ToastAndroid.LONG);
     RootNavigation.navigate('DownloadData');
   }
   else {
-    connect();
-    OsbleStartService();
+    // connect();
+    connectBle();
+    ZeeraAppStartService();
   }
 }
 
@@ -489,6 +491,99 @@ export const uninitializeBleListener = () => {
 }
 
 
+export const connectBle = async () => {
+  // check with bleAddress
+  let isDeviceConnected = await bleManager.isDeviceConnected(store.getState().appReducer.bleAddress).then(connected => connected);
+  let connectToDevice = null;
+
+  console.log('isDeviceConnected?', isDeviceConnected);
+  if (!isDeviceConnected) {
+
+    console.log(`Attempting connection to ${store.getState().appReducer.bleAddress}`);
+    addData({
+      data: `Attempting connection to ${store.getState().appReducer.bleAddress}`,
+      timestamp: new Date(),
+      type: 'error',
+    });
+
+    try {
+      connectToDevice = await bleManager.connectToDevice(store.getState().appReducer.bleAddress).then(device => device);
+
+      console.log('connectToDevice', connectToDevice);
+
+      if (connectToDevice) {
+        // console.log('connect was successful', connectToDevice.id);
+        // this.props.setBleConnected(true);
+        // this.props.setBleStatus(`Argo connection was successful`);
+        
+        // store.dispatch(setDevice(connectToDevice));
+        // store.dispatch()
+        // observeDevice(connectToDevice);
+
+        addData({
+          data: 'Connection successful',
+          timestamp: new Date(),
+          type: 'info',
+        });
+
+        // auto send log
+        // sendData();
+        await store.dispatch(setBluetoothToggleConnection(true));
+        await store.dispatch(setDevice(connectToDevice)); // karena callback connection itu isinya device dari native module
+        observeDevice(connectToDevice);
+      }
+    }
+    catch (e) {
+      // this.props.setBleConnected(false);
+      // this.props.setBleStatus(`Error: ${e.toString()}`);
+      // this.props.setArgoCmd(null);
+      console.log(`Error connect to device: ${e.toString()}`);
+      addData({
+        data: `Error connect to device: ${e.toString()}`,
+        timestamp: new Date(),
+        type: 'error',
+      });
+      ToastAndroid.show(`Error connect to device: ${e.toString()}`, ToastAndroid.LONG);
+      // store.dispatch(setDiscovering(false));
+      // store.dispatch(setDevice(null));
+    }
+  }
+}
+
+export const disconnectBle = async() => {
+  console.log('[BluetoothConnection] disconnect......');
+
+  let disconnected = null;
+
+  try {
+    if (store.getState().appReducer.device) {
+      // disconnected = await store.getState().appReducer.device.disconnect();
+      disconnected = await bleManager.cancelDeviceConnection(store.getState().appReducer.bleAddress);
+      console.log('disconnected...', disconnected);
+      addData({
+        data: 'Disconnected',
+        timestamp: new Date(),
+        type: 'info',
+      });
+
+      store.dispatch(setBluetoothToggleConnection(false));
+      store.dispatch(setDevice(null));
+    }
+  } catch (error) {
+    console.log('Disconnect failed: ', error.toString())
+    addData({
+      data: `Disconnect failed: ${error.toString()}`,
+      timestamp: new Date(),
+      type: 'error',
+    });
+
+    if (error.toString().includes('Not connected to')) {
+
+    }
+  }
+}
+
+
 // export const startScan = () => {
 //   if (!isScanning) {
 //     BleManager.scan([], 3, true).then((results) => {
@@ -527,62 +622,7 @@ export const startDiscoveryBLE = async () => {
 
     await store.dispatch(setDiscovering(true));
 
-    // check with bleAddress
-    let isDeviceConnected = await bleManager.isDeviceConnected(store.getState().appReducer.bleAddress).then(connected => connected);
-    let connectToDevice = null;
-
-    console.log('isDeviceConnected?', isDeviceConnected);
-    if (!isDeviceConnected) {
-
-      console.log(`Attempting connection to ${store.getState().appReducer.bleAddress}`);
-      addData({
-        data: `Attempting connection to ${store.getState().appReducer.bleAddress}`,
-        timestamp: new Date(),
-        type: 'error',
-      });
-
-      try {
-        connectToDevice = await bleManager.connectToDevice(store.getState().appReducer.bleAddress).then(device => device);
-
-        console.log('connectToDevice', connectToDevice);
-
-        if (connectToDevice) {
-          // console.log('connect was successful', connectToDevice.id);
-          // this.props.setBleConnected(true);
-          // this.props.setBleStatus(`Argo connection was successful`);
-          
-          // store.dispatch(setDevice(connectToDevice));
-          // store.dispatch()
-          // observeDevice(connectToDevice);
-
-          addData({
-            data: 'Connection successful',
-            timestamp: new Date(),
-            type: 'info',
-          });
-
-          // auto send log
-          // sendData();
-          await store.dispatch(setBluetoothToggleConnection(true));
-          await store.dispatch(setDevice(connectToDevice)); // karena callback connection itu isinya device dari native module
-          observeDevice(connectToDevice);
-        }
-      }
-      catch (e) {
-        // this.props.setBleConnected(false);
-        // this.props.setBleStatus(`Error: ${e.toString()}`);
-        // this.props.setArgoCmd(null);
-        console.log(`Error connect to device: ${e.toString()}`);
-        addData({
-          data: `Error connect to device: ${e.toString()}`,
-          timestamp: new Date(),
-          type: 'error',
-        });
-        ToastAndroid.show(`Error connect to device: ${e.toString()}`, ToastAndroid.LONG);
-        // store.dispatch(setDiscovering(false));
-        // store.dispatch(setDevice(null));
-      }
-    }
+    await connectBle();
   }
   catch(e) {
     console.log('Error discovery', e.toString());
