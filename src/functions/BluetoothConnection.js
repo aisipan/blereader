@@ -644,7 +644,7 @@ export const observeDevice = async (device) => {
     const dev2 = await device.discoverAllServicesAndCharacteristics();
     const services = await bleManager.servicesForDevice(device.id)
     for (const svc of services) {
-      // console.log(`Device service, id=${svc.id}, uuid=${svc.uuid}`, svc)
+      console.log(`Device service, id=${svc.id}, uuid=${svc.uuid}`, svc)
       const chars = await bleManager.characteristicsForDevice(device.id, svc.uuid)
       dumpDeviceCharacteristics(device, svc, chars)
     }
