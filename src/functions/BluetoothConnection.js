@@ -16,7 +16,6 @@ import {
   setDevice,
 } from '../redux/actions'
 import { store } from '../redux/store';
-import { getAndParseRecordData } from './ble';
 import * as RootNavigation from '../routes/RootNavigation';
 import { OsbleStartService, OsbleStopService } from './OsbleHeadlessTask'
 
