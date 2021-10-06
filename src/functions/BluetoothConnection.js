@@ -666,7 +666,7 @@ export const observeDevice = async (device) => {
 
 export const dumpDeviceCharacteristics = (dev, svc, chars) => {
   for (const ch of chars) {
-    // console.log('Device Characteristics', ch)
+    console.log('Device Characteristics', ch)
     setupNotification(dev, svc, ch)
   }
 }
@@ -691,7 +691,7 @@ export const setupNotification = (dev, svc, chr) => {
             type: 'error',
           });
       } else {
-          // console.log(`UUID=${c.uuid}, value=${c.value}`, c)
+          console.log(`UUID=${c.uuid}, value=${c.value}`, c)
           // this.props.setBleConnected(true);
           // this.props.setBleStatus(`Argo connection was successful`);
           addData({
@@ -703,6 +703,8 @@ export const setupNotification = (dev, svc, chr) => {
           // store.dispatch(setDevice())
           buffer = Buffer.from(c.value, 'base64');
           // const res = this.argoData.push(buffer);
+
+          console.log('buffer...', buffer);
 
           addData({
             data: buffer,
