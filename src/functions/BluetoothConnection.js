@@ -671,12 +671,34 @@ export const dumpDeviceCharacteristics = (dev, svc, chars) => {
   }
 }
 
+export const setupDescriptor =  async (dev, svc, chr) => {
+  let val = Buffer.from(COMMAND_START, 'base64');
+  
+  try {
+    const descriptors = bleManager.descriptorsForDevice(dev.id, svc.uuid, chr.uuid);
+    for (const desc of descriptors) {
+      console.log('setupDescriptor desc', desc);
+    }
+  } 
+  catch (e) {
+    console.log(`Error setupDescriptor: ${e.toString()}`);
+    addData({
+      data: `Error setupDescriptor: ${e.toString()}`,
+      timestamp: new Date(),
+      type: 'error',
+    });
+    // ToastAndroid.show(`Error setupDescriptor: ${e.toString()}`, ToastAndroid.LONG);
+  }
+  return true
+}
+
 export const setupNotification = (dev, svc, chr) => {
   let buffer = null;
   let bufString = null;
-  if (!chr.isNotifiable) {
-      return
-  }
+  // if (!chr.isNotifiable) {
+  //     setupDescriptor(dev, svc, chr);
+  //     return
+  // }
   dev.monitorCharacteristicForService(svc.uuid, chr.uuid, (e, c) => {
       if (e) {
           // console.log('Error monitor', e);
