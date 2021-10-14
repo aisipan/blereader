@@ -390,10 +390,10 @@ export const onReceivedData = async (event) => {
   // console.log('event', JSON.stringify(event));
   // console.log('event.data',JSON.stringify(event.data));
 
-  if (event && event.data && typeof(event.data) === 'string' && event.data.includes("[REC.GEN]") &&  event.data.includes("Record Content")) {
-    console.log('=============================GET RECORD DATA!!!===================================');
-    await getAndParseRecordData(event.data);
-  }
+  // if (event && event.data && typeof(event.data) === 'string' && event.data.includes("[REC.GEN]") &&  event.data.includes("Record Content")) {
+  //   console.log('=============================GET RECORD DATA!!!===================================');
+  //   await getAndParseRecordData(event.data);
+  // }
 
   addData({
     ...event,
@@ -673,6 +673,8 @@ export const dumpDeviceCharacteristics = (dev, svc, chars) => {
 
 export const setupDescriptor =  async (dev, svc, chr) => {
   let val = Buffer.from(COMMAND_START, 'base64');
+  // console.log('setupDescriptor val', val);
+  console.log('setupDescriptor dev.id', dev.id);
   
   try {
     const descriptors = bleManager.descriptorsForDevice(dev.id, svc.uuid, chr.uuid);
@@ -696,51 +698,85 @@ export const setupNotification = (dev, svc, chr) => {
   let buffer = null;
   let bufString = null;
   // if (!chr.isNotifiable) {
-  //     setupDescriptor(dev, svc, chr);
+  //     // setupDescriptor(dev, svc, chr);
+  //     // let val = Buffer.from(COMMAND_START, 'base64');
+  //     // bleManager.writeCharacteristicWithResponseForDevice(val);
   //     return
   // }
-  dev.monitorCharacteristicForService(svc.uuid, chr.uuid, (e, c) => {
-      if (e) {
-          // console.log('Error monitor', e);
-          // this.setState({bleStatus: `Error monitor: ${e.toString()}`, bleConnected: false});
-          // this.props.setBleConnected(false);
-          // this.props.setBleStatus(`Error monitor: ${e.toString()}`);
-          // this.props.setArgoCmd(null);
-          console.log(`Error monitor: ${e.toString()}`);
-          addData({
-            data: `Error monitor: ${e.toString()}`,
-            timestamp: new Date(),
-            type: 'error',
-          });
-      } else {
-          console.log(`UUID=${c.uuid}, value=${c.value}`, c)
-          // this.props.setBleConnected(true);
-          // this.props.setBleStatus(`Argo connection was successful`);
-          addData({
-            data: `Device connection was successful`,
-            timestamp: new Date(),
-            type: 'info',
-          });
-          // store.dispatch(setDiscovering(false));
-          // store.dispatch(setDevice())
-          buffer = Buffer.from(c.value, 'base64');
-          // const res = this.argoData.push(buffer);
 
-          console.log('buffer...', buffer);
+  // let val = Buffer.from(COMMAND_START, 'base64');
+  
 
-          addData({
-            data: buffer,
-            timestamp: new Date(),
-            type: 'receive',
-          });
+  dev.writeCharacteristicWithResponseForService(svc.uuid, chr.uuid, 'REFBNQ==')
+  .then(c => {
+    console.log(`UUID=${c.uuid}, value=${c.value}`, c)
+    addData({
+      data: `Device connection was successful`,
+      timestamp: new Date(),
+      type: 'info',
+    });
 
+    buffer = Buffer.from(c.value, 'base64');
 
-          // if (res !== false) {
-          //   //console.log(`cmd: ${this.argoData.lastCommand()}, frame to string: ${frame.toString('hex')}`);
-          //   this.parseData(res.command, res.frame)
-          // }
-      }
+    console.log('buffer...', buffer);
+
+    addData({
+      data: buffer,
+      timestamp: new Date(),
+      type: 'receive',
+    });
+
   })
+  .catch(e => {
+    console.log(`Error writeCharacteristicWithResponseForService: ${e.toString()}`);
+    addData({
+      data: `Error writeCharacteristicWithResponseForService: ${e.toString()}`,
+      timestamp: new Date(),
+      type: 'error',
+    });
+  })
+  // dev.monitorCharacteristicForService(svc.uuid, chr.uuid, (e, c) => {
+  //     if (e) {
+  //         // console.log('Error monitor', e);
+  //         // this.setState({bleStatus: `Error monitor: ${e.toString()}`, bleConnected: false});
+  //         // this.props.setBleConnected(false);
+  //         // this.props.setBleStatus(`Error monitor: ${e.toString()}`);
+  //         // this.props.setArgoCmd(null);
+  //         console.log(`Error monitor: ${e.toString()}`);
+  //         addData({
+  //           data: `Error monitor: ${e.toString()}`,
+  //           timestamp: new Date(),
+  //           type: 'error',
+  //         });
+  //     } else {
+  //         console.log(`UUID=${c.uuid}, value=${c.value}`, c)
+  //         // this.props.setBleConnected(true);
+  //         // this.props.setBleStatus(`Argo connection was successful`);
+  //         addData({
+  //           data: `Device connection was successful`,
+  //           timestamp: new Date(),
+  //           type: 'info',
+  //         });
+  //         // store.dispatch(setDiscovering(false));
+  //         // store.dispatch(setDevice())
+  //         buffer = Buffer.from(c.value, 'base64');
+  //         // const res = this.argoData.push(buffer);
+
+  //         console.log('buffer...', buffer);
+
+  //         addData({
+  //           data: buffer,
+  //           timestamp: new Date(),
+  //           type: 'receive',
+  //         });
+
+
+  //         // if (res !== false) {
+  //         //   //console.log(`cmd: ${this.argoData.lastCommand()}, frame to string: ${frame.toString('hex')}`);
+  //         //   this.parseData(res.command, res.frame)
+  //         // }
+  //     }
+  // })
 }
 
 export const handleDiscoverPeripheral = (peripheral) => {
