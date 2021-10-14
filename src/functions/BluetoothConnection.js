@@ -34,6 +34,7 @@ var bleManager = null;
 
 // Zeera
 const COMMAND_START = 'DAA5';
+const COMMAND_START_BASE64 = 'REFBNQ==';
 const COMMAND_STOP = 'DB';
 
 export const checkBluetoothEnabled = async () => {
@@ -707,11 +708,11 @@ export const setupNotification = (dev, svc, chr) => {
   // let val = Buffer.from(COMMAND_START, 'base64');
   
 
-  dev.writeCharacteristicWithResponseForService(svc.uuid, chr.uuid, 'REFBNQ==')
+  dev.writeCharacteristicWithResponseForService(svc.uuid, chr.uuid, COMMAND_START_BASE64)
   .then(c => {
-    console.log(`UUID=${c.uuid}, value=${c.value}`, c)
+    console.log(`Write characteristic with response for service: UUID=${c.uuid}, value=${c.value}`, c)
     addData({
-      data: `Device connection was successful`,
+      data: `Write characteristic with response for service`,
       timestamp: new Date(),
       type: 'info',
     });
@@ -726,6 +727,50 @@ export const setupNotification = (dev, svc, chr) => {
       type: 'receive',
     });
 
+    dev.monitorCharacteristicForService(c.serviceUUID, c.uuid, (e, c) => {
+        if (e) {
+            // console.log('Error monitor', e);
+            // this.setState({bleStatus: `Error monitor: ${e.toString()}`, bleConnected: false});
+            // this.props.setBleConnected(false);
+            // this.props.setBleStatus(`Error monitor: ${e.toString()}`);
+            // this.props.setArgoCmd(null);
+            console.log(`Error monitor characteristic for service: ${e.toString()}`);
+            addData({
+              data: `Error monitor characteristic for service: ${e.toString()}`,
+              timestamp: new Date(),
+              type: 'error',
+            });
+        } else {
+            // console.log(`UUID=${c.uuid}, value=${c.value}`, c)
+            // this.props.setBleConnected(true);
+            // this.props.setBleStatus(`Argo connection was successful`);
+            console.log(`Monitor characteristic for service...`);
+            addData({
+              data: `Monitor characteristic for service`,
+              timestamp: new Date(),
+              type: 'info',
+            });
+            // store.dispatch(setDiscovering(false));
+            // store.dispatch(setDevice())
+            buffer = Buffer.from(c.value, 'base64');
+            // const res = this.argoData.push(buffer);
+
+            console.log('buffer...', buffer);
+
+            addData({
+              data: buffer,
+              timestamp: new Date(),
+              type: 'receive',
+            });
+
+
+            // if (res !== false) {
+            //   //console.log(`cmd: ${this.argoData.lastCommand()}, frame to string: ${frame.toString('hex')}`);
+            //   this.parseData(res.command, res.frame)
+            // }
+        }
+    })
+
   })
   .catch(e => {
     console.log(`Error writeCharacteristicWithResponseForService: ${e.toString()}`);
@@ -735,48 +780,6 @@ export const setupNotification = (dev, svc, chr) => {
       type: 'error',
     });
   })
-  // dev.monitorCharacteristicForService(svc.uuid, chr.uuid, (e, c) => {
-  //     if (e) {
-  //         // console.log('Error monitor', e);
-  //         // this.setState({bleStatus: `Error monitor: ${e.toString()}`, bleConnected: false});
-  //         // this.props.setBleConnected(false);
-  //         // this.props.setBleStatus(`Error monitor: ${e.toString()}`);
-  //         // this.props.setArgoCmd(null);
-  //         console.log(`Error monitor: ${e.toString()}`);
-  //         addData({
-  //           data: `Error monitor: ${e.toString()}`,
-  //           timestamp: new Date(),
-  //           type: 'error',
-  //         });
-  //     } else {
-  //         console.log(`UUID=${c.uuid}, value=${c.value}`, c)
-  //         // this.props.setBleConnected(true);
-  //         // this.props.setBleStatus(`Argo connection was successful`);
-  //         addData({
-  //           data: `Device connection was successful`,
-  //           timestamp: new Date(),
-  //           type: 'info',
-  //         });
-  //         // store.dispatch(setDiscovering(false));
-  //         // store.dispatch(setDevice())
-  //         buffer = Buffer.from(c.value, 'base64');
-  //         // const res = this.argoData.push(buffer);
-
-  //         console.log('buffer...', buffer);
-
-  //         addData({
-  //           data: buffer,
-  //           timestamp: new Date(),
-  //           type: 'receive',
-  //         });
-
-
-  //         // if (res !== false) {
-  //         //   //console.log(`cmd: ${this.argoData.lastCommand()}, frame to string: ${frame.toString('hex')}`);
-  //         //   this.parseData(res.command, res.frame)
-  //         // }
-  //     }
-  // })
 }
 
 export const handleDiscoverPeripheral = (peripheral) => {
